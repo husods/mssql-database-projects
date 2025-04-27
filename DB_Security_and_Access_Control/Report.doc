@@ -1,0 +1,83 @@
+# Database Security and Access Control Project
+
+## Objective
+The goal of this project is to implement robust database security mechanisms including access control, data encryption, auditing, and protection against SQL injection vulnerabilities on a Microsoft SQL Server environment.
+
+## Tools and Technologies
+- Microsoft SQL Server Management Studio (SSMS)
+- T-SQL (Transact-SQL)
+
+## Project Steps
+
+### 1. Access Control Implementation
+
+- **Login and User Creation:**  
+  Created a new server login (`airbnb_reader`) and mapped it to a database user. This separation of authentication (login) and authorization (user) ensures better management of access privileges.
+
+- **Permission Management:**  
+  Initially granted SELECT permission on the entire `dbo` schema, and later assigned the `db_datareader` role to enforce a strict read-only policy.  
+  Permissions were tested by executing read and write operations, confirming that unauthorized writes were correctly blocked.
+
+- **Role Management:**  
+  Evaluated existing database roles and customized access based on the principle of least privilege.
+
+> **Main File:** `Access_Control_and_Data_Encryption.sql`
+
+---
+
+### 2. Data Encryption Setup
+
+- **Master Key Creation:**  
+  A database master key was created to protect encryption certificates and symmetric keys within the database.
+
+- **Certificate Generation:**  
+  Developed a certificate (`TDE_Cert`) to enable Transparent Data Encryption (TDE), ensuring that data stored at rest remains encrypted.
+
+- **Database Encryption Key Configuration:**  
+  A Database Encryption Key (DEK) was created using the AES-256 encryption algorithm, leveraging the certificate.
+
+- **Backup Strategy:**  
+  Backups of the certificate and master key were generated to secure them against possible future data recovery needs.
+
+> **Main File:** `Access_Control_and_Data_Encryption.sql`
+
+---
+
+### 3. Audit Logging
+
+- **Audit Policy Configuration:**  
+  A server audit specification was created to track critical operations such as SELECT and INSERT commands on sensitive tables.  
+  Audit records were configured to be saved into external audit files.
+
+- **Security Monitoring:**  
+  The auditing mechanism helps administrators monitor unauthorized or suspicious activity effectively without impacting database performance.
+
+> **Main File:** `AuditLogs.sql`
+
+---
+
+### 4. SQL Injection Defense Testing
+
+- **Vulnerability Simulation:**  
+  Test cases were developed to simulate common SQL Injection attack patterns against vulnerable queries.
+
+- **Mitigation Verification:**  
+  The results showed that properly parameterized queries and defensive coding practices successfully protected the database from injection attacks.
+
+- **Best Practice Enforcement:**  
+  Testing highlighted the importance of always validating user input and avoiding dynamic SQL construction without proper safeguards.
+
+> **Main File:** `SQL_injection_tests.sql`
+
+---
+
+## Repository Structure
+- `/Access_Control_and_Data_Encryption.sql` - Scripts for access management and encryption setup
+- `/AuditLogs.sql` - Scripts for audit policy creation and event monitoring
+- `/SQL_injection_tests.sql` - Scripts for SQL injection vulnerability testing
+
+## Conclusion
+Through access control enforcement, data encryption, auditing, and proactive vulnerability testing, a strong multi-layered security framework was established for the database environment.  
+This approach not only reduces risks associated with unauthorized access and data breaches but also aligns with industry best practices for secure database management.
+
+---
