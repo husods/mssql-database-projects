@@ -1,0 +1,85 @@
+**Airbnb Open Data ETL Project Report**
+
+---
+
+# 1. Project Objective
+Clean and prepare the "Airbnb_Open_Data" dataset for analytical and reporting purposes by applying a structured ETL (Extract, Transform, Load) process.
+
+---
+
+# 2. Data Quality Assessment
+- **Checked total records and NULL values** for important columns to assess data completeness.
+  
+  **(Resim önerisi: NULL count sorgusu sonucu ekran görüntüsü)**
+
+---
+
+# 3. Data Cleaning
+### 3.1 Filling Missing Values
+- Filled missing **categorical (text)** fields with default placeholders (e.g., 'Unknown', 'Not specified').
+- Filled missing **numeric and boolean** fields with logical defaults (e.g., 0, 0.0).
+
+### 3.2 Removing Invalid Records
+- Deleted records where **latitude or longitude** values were missing.
+- Removed listings with **minimum_nights > 366** as unrealistic.
+
+### 3.3 Correcting Excel Errors
+- Replaced **#NAME?** errors in `house_rules` with 'Not Provided'.
+
+---
+
+# 4. Duplicate Handling
+- Detected duplicate records using all relevant fields.
+- Retained only the first occurrence of each duplicate.
+
+  **(Resim önerisi: Duplicate detection sorgusu sonucu)**
+
+---
+
+# 5. Data Reduction
+- Dropped **license** column due to low availability.
+- Dropped **country** and **country_code** columns since all records are from "United States".
+
+---
+
+# 6. Data Encoding
+- Encoded `host_identity_verified` column into binary format (0/1) and renamed it to `host_verified_flag`.
+
+  **(Resim önerisi: host_identity_verified distinct değer sorgusu sonucu)**
+
+---
+
+# 7. Feature Engineering
+- Created `total_price` as the sum of `price` and `service_fee`.
+- Categorized `price` into three segments: `cheap`, `medium`, and `expensive`.
+
+  **(Resim önerisi: PERCENTILE_CONT hesaplama sonucu ve yeni price_category güncellemesi)**
+
+---
+
+# 8. Data Validation
+- Corrected invalid values in `availability_365`, `minimum_nights`.
+- Added the following constraints to ensure data integrity:
+  - `availability_365` between 0 and 365
+  - `review_rate_number` between 1 and 5
+  - `price`, `service_fee`, `reviews_per_month` ≥ 0
+  - `minimum_nights` ≥ 1
+
+---
+
+# 9. Final Data Load
+- Loaded the cleaned and transformed data into a final table named **Airbnb_Cleaned_Final**.
+
+  **(Resim önerisi: Airbnb_Cleaned_Final ilk 5 satır görüntüsü)**
+
+---
+
+# 10. Summary
+The ETL process successfully:
+- Improved data quality by handling missing, incorrect, and duplicate values.
+- Reduced irrelevant columns.
+- Engineered new features for better analytical insights.
+- Applied strict validation rules to ensure consistency.
+
+Ready for further data analysis or machine learning tasks.
+
