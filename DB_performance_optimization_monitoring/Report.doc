@@ -1,0 +1,34 @@
+# Database Performance Optimization and Monitoring Project
+
+## Objective
+Analyze a large database to apply optimization techniques, improve query performance, and implement monitoring strategies.
+
+## Tools Used
+- Microsoft SQL Server Management Studio (SSMS)
+- T-SQL (Transact-SQL)
+
+## Performed Steps
+
+### 1. Query Performance Analysis
+- Used Dynamic Management Views (DMV) to evaluate query performance.
+- Identified queries with high logical reads, high CPU usage, and long execution times.
+
+### 2. Query Optimization
+- Rewrote inefficient queries to improve execution speed.
+- Added missing indexes on critical columns used in WHERE, JOIN, and ORDER BY clauses.
+
+### 3. Index Management
+- Created new indexes to optimize data retrieval.
+- Dropped unused or redundant indexes to free up resources.
+
+### 4. Monitoring Setup
+- Configured SQL Profiler to trace long-running queries and resource-heavy operations.
+- Applied filters to monitor only critical performance events.
+
+### 5. Access Control Adjustments
+- Created roles and assigned specific database access permissions.
+- Ensured that users only have the minimum necessary privileges.
+
+## Conclusion
+Database performance was successfully improved through query optimization and proper indexing.  
+Continuous monitoring was established, and access control was tightened to enhance database security.
