@@ -1,4 +1,4 @@
-# MSSQL Database Projects Portfolio
+# MSSQL Database Projects
 
 This repository contains various database management and security projects built using Microsoft SQL Server.
 
