@@ -1,26 +1,26 @@
-﻿-- Bu bölümde, MSSQL üzerinde basit SQL Injection senaryolarını simüle ederek
--- zafiyetleri ve korunma yöntemlerini inceleyeceğiz.
+-- =============================================
+-- Section 3: SQL Injection Test Cases
+-- =============================================
 
 -- ---------------------------------------------
--- 3.1: Zafiyetli Arama Sorgusu Simülasyonu
+-- 3.1: Vulnerable Search Simulation
 -- ---------------------------------------------
--- Aşağıdaki örnek, kullanıcıdan alınan bir isme göre Airbnb odalarını arayan
--- güvenli olmayan bir sorguyu simüle etmektedir. Kullanıcı girdisi doğrudan
--- SQL sorgusuna eklenmektedir.
+-- This query simulates an unsafe search functionality where user input
+-- is directly concatenated into the SQL query, making it vulnerable to SQL Injection.
+
 DECLARE @searchName NVARCHAR(255);
-SET @searchName = '<Kullanıcının Girdiği İsim>'; -- Kullanıcının arama kutusuna yazdığı değer
+SET @searchName = '<User Input>'; 
 
 DECLARE @sql NVARCHAR(MAX);
 SET @sql = 'SELECT * FROM Airbnb_Cleaned_Final WHERE name LIKE ''%' + @searchName + '%''';
 
--- Güvenli olmayan sorguyu çalıştırma (UYGULAMAYIN - SADECE SİMÜLASYON)
+-- Vulnerable query execution (DO NOT EXECUTE IN PRODUCTION)
 -- EXEC (@sql);
 
 -- ---------------------------------------------
--- 3.2: Normal Arama
+-- 3.2: Normal Search Input
 -- ---------------------------------------------
--- Kullanıcının normal bir arama terimi girmesi durumu.
--- Aşağıdaki örnekte, arama terimi olarak 'Luxury' kullanıyoruz.
+-- Simulating a normal search with a legitimate input (e.g., 'Luxury').
 
 DECLARE @searchName_normal NVARCHAR(255);
 SET @searchName_normal = 'Luxury';
@@ -30,16 +30,12 @@ SET @sql_normal = 'SELECT * FROM Airbnb_Cleaned_Final WHERE name LIKE ''%' + @se
 EXEC (@sql_normal);
 GO
 
--- Bu sorguyu çalıştırdığınızda, 'name' sütununda 'Luxury' kelimesi geçen
--- tüm Airbnb kayıtlarını görmelisiniz. Bu, uygulamanın normal bir
--- senaryoda nasıl çalıştığını gösterir.
+-- The query returns all rows where 'name' contains 'Luxury'.
 
 -- ---------------------------------------------
--- 3.3: Temel SQL Injection Denemesi - ' OR '1'='1'
+-- 3.3: Basic SQL Injection - ' OR '1'='1'
 -- ---------------------------------------------
--- Bu deneme, WHERE koşulunu her zaman DOĞRU yapacak bir SQL ifadesi enjekte ederek
--- tüm kayıtları döndürmeyi amaçlar. '--' sonrası yorum satırı anlamına gelir
--- ve sorgunun geri kalanını etkisiz hale getirir.
+-- This test injects an always-true condition to retrieve all records.
 
 DECLARE @searchName_injection1 NVARCHAR(255);
 SET @searchName_injection1 = ''' OR ''1''=''1'' --';
@@ -49,17 +45,12 @@ SET @sql_injection1 = 'SELECT * FROM Airbnb_Cleaned_Final WHERE name LIKE ''%' +
 EXEC (@sql_injection1);
 GO
 
--- Bu sorguyu çalıştırdığınızda, normalde sadece 'Luxury' içeren kayıtlar yerine
--- veritabanındaki TÜM kayıtları görmelisiniz. Bu, SQL Injection zafiyetinin
--- başarılı bir şekilde nasıl kullanılabileceğini gösterir. Saldırgan,
--- uygulamanın sorgusuna kendi zararlı SQL kodunu ekleyerek veritabanının
--- tüm içeriğine erişebilir.
+-- This query returns all records, demonstrating a successful SQL Injection attack.
 
 -- ---------------------------------------------
--- 3.4: Temel SQL Injection Denemesi - Yorum Satırı Kullanımı
+-- 3.4: SQL Injection Using Comment
 -- ---------------------------------------------
--- Bu deneme, arama teriminden sonra bir yorum satırı ekleyerek sorgunun
--- orijinal WHERE koşulunun etkisiz hale getirilmesini amaçlar.
+-- This test injects a comment symbol (--) to manipulate the WHERE clause.
 
 DECLARE @searchName_injection2 NVARCHAR(255);
 SET @searchName_injection2 = 'Luxury'' --';
@@ -69,45 +60,36 @@ SET @sql_injection2 = 'SELECT * FROM Airbnb_Cleaned_Final WHERE name LIKE ''%' +
 EXEC (@sql_injection2);
 GO
 
--- Bu sorguyu çalıştırdığınızda, 'name' sütununda 'Luxury' ile biten
--- tüm kayıtları görmelisiniz. Saldırgan, orijinal sorgunun mantığını
--- değiştirerek farklı sonuçlar elde edebilir.
+-- This query shows how a comment can disable parts of a SQL statement.
 
 -- ---------------------------------------------
--- 3.5: Güvenli Arama Sorgusu (Parametreli)
+-- 3.5: Secure Search Using Parameterized Query
 -- ---------------------------------------------
--- Aşağıdaki örnek, aynı arama işlemini parametreli sorgu (prepared statement)
--- kullanarak güvenli bir şekilde nasıl gerçekleştirebileceğimizi göstermektedir.
--- Parametreli sorgularda, kullanıcı girdisi doğrudan SQL koduyla birleştirilmez,
--- bu da SQL Injection riskini ortadan kaldırır.
+-- This example uses sp_executesql with parameters to prevent SQL Injection.
 
 DECLARE @searchName_secure NVARCHAR(255);
-SET @searchName_secure = ''' OR ''1''=''1'' --'; -- Zararlı giriş
+SET @searchName_secure = ''' OR ''1''=''1'' --';
 
--- Parametreli sorgu çalıştırma
-EXEC sp_executesql N'SELECT * FROM Airbnb_Cleaned_Final WHERE name LIKE ''%'' + @isim + ''%''',
-                   N'@isim NVARCHAR(255)',
-                   @isim = @searchName_secure;
+EXEC sp_executesql 
+    N'SELECT * FROM Airbnb_Cleaned_Final WHERE name LIKE ''%'' + @searchName + ''%''',
+    N'@searchName NVARCHAR(255)',
+    @searchName = @searchName_secure;
 GO
 
--- Bu sorguyu çalıştırdığınızda, zararlı giriş (' OR '1'='1' --) normal bir
--- metin değeri olarak ele alınır ve büyük olasılıkla hiçbir kayıt dönmez
--- (çünkü tam olarak bu ifadeyi içeren bir oda adı olmayacaktır). Bu,
--- parametreli sorguların SQL Injection saldırılarına karşı ne kadar etkili
--- olduğunu gösterir.
+-- Even with malicious input, no injection occurs because parameters are treated as data.
 
 -- ---------------------------------------------
--- 3.6: Güvenli Arama Sorgusu (Normal Girişle)
+-- 3.6: Secure Search With Normal Input
 -- ---------------------------------------------
--- Parametreli sorgunun normal bir arama terimiyle nasıl çalıştığına bakalım.
+-- Testing the parameterized query with normal input.
 
 DECLARE @searchName_secure_normal NVARCHAR(255);
 SET @searchName_secure_normal = 'Luxury';
 
-EXEC sp_executesql N'SELECT * FROM Airbnb_Cleaned_Final WHERE name LIKE ''%'' + @isim + ''%''',
-                   N'@isim NVARCHAR(255)',
-                   @isim = @searchName_secure_normal;
+EXEC sp_executesql 
+    N'SELECT * FROM Airbnb_Cleaned_Final WHERE name LIKE ''%'' + @searchName + ''%''',
+    N'@searchName NVARCHAR(255)',
+    @searchName = @searchName_secure_normal;
 GO
 
--- Bu sorguyu çalıştırdığınızda, normalde beklendiği gibi 'Luxury' içeren
--- oda kayıtlarını görmelisiniz.
+-- This correctly returns rows where 'name' contains 'Luxury'.
