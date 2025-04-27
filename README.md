@@ -5,7 +5,7 @@ This repository contains various database management and security projects built
 ## Projects
 
 - [Database Performance Optimization and Monitoring](./DB_performance_optimization_monitoring)
-- [Database Security and Access Control](./DB_security_access_control)
+- [Database Security and Access Control](./DB_security_and_access_control)
 - [ETL Processes and Data Cleaning](./Data_Cleaning_and_ETL_Project)
 
 Each project folder contains documentation, SQL scripts, and a summary of the tasks completed.
